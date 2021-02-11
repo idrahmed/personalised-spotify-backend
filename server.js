@@ -63,7 +63,7 @@ app.get("/login", (req, res) => {
         res.send({ access_token: access_token });
       });
 
-      res.redirect("http://localhost:3000/toptracks");
+      res.redirect("personalised-spotify.netlify.app/toptracks");
 
       setInterval(async () => {
         const data = await spotifyApi.refreshAccessToken();
