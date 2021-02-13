@@ -1,6 +1,9 @@
 import SpotifyWebApi from "spotify-web-api-node"
 import express from "express";
 import cors from "cors";
+import recommendationsRouter from './routes/recommendationRoutes.js'
+import topTracksRouter from './routes/topTracksRoutes.js'
+import topArtistsRouter from './routes/topArtistsRoutes.js'
 
 const scopes = [
   "user-read-recently-played",
@@ -15,10 +18,11 @@ const scopes = [
 ];
 
 // credentials are optional
-const spotifyApi = new SpotifyWebApi({
+export const spotifyApi = new SpotifyWebApi({
   clientId: "ec4be58cbb9b474e9e4d978008f361d3",
   clientSecret: "df155eab40c04a07b34a3e3db5e4caa2",
-  redirectUri: "https://personalised-spotify.herokuapp.com/login",
+  redirectUri: "http://localhost:9000/login"
+  // "https://personalised-spotify.herokuapp.com/login",
 });
 
 const app = express();
@@ -26,6 +30,9 @@ const PORT = process.env.PORT || 9000;
 
 app.use(cors());
 app.use(express.json()); // recognize the incoming Request Object as a JSON Object.
+app.use("/recommendations", recommendationsRouter)
+app.use("/top-tracks", topTracksRouter)
+app.use("/top-artists", topArtistsRouter)
 
 app.get("/callback", (req, res) => {
   res.redirect(spotifyApi.createAuthorizeURL(scopes));
@@ -63,7 +70,7 @@ app.get("/login", (req, res) => {
         res.send({ access_token: access_token });
       });
 
-      res.redirect("https://personalised-spotify.netlify.app/toptracks");
+      res.redirect("http://localhost:3000/toptracks");
 
       setInterval(async () => {
         const data = await spotifyApi.refreshAccessToken();
@@ -107,15 +114,6 @@ app.post('/create-playlist', (req, res) => {
 })
 
 
-app.get('/playlists', (req, res) => {
-  spotifyApi.getUserPlaylists('qmkhn9u9s5qpv9en1dw8udzwv')
-  .then(function(data) {
-    res.send(data.body)
-    console.log('Retrieved playlists', data.body);
-  },function(err) {
-    console.log('Something went wrong!', err);
-  });
-})
 
 
 app.post('/artist-top-tracks', (req, res) => {
@@ -168,112 +166,6 @@ app.put('/saved-artist', (req, res) => {
 });
 
 
-app.get("/recommendations/weekly", (req, res) => {
-  spotifyApi
-    .searchPlaylists("Discover Weekly", {
-      limit: 1,
-    })
-    .then(function (data) {
-      return data.body.playlists.items[0].id;
-    })
-    .then((response) => {
-      spotifyApi
-        .getPlaylistTracks(response, { limit: 100 })
-        .then(function (data) {
-          res.send(data.body.items);
-        });
-    });
-});
-
-app.get("/recommendations/daily", (req, res) => {
-  spotifyApi
-    .searchPlaylists("Daily Mix", {
-      limit: 1,
-    })
-    .then(function (data) {
-      return data.body.playlists.items[0].id;
-    })
-    .then((response) => {
-      spotifyApi
-        .getPlaylistTracks(response, { limit: 100 })
-        .then(function (data) {
-          res.send(data.body.items);
-        });
-    });
-});
-
-
-app.get("/top-tracks/long_term", (req, res) => {
-  spotifyApi.getMyTopTracks({ limit: 100, time_range: "long_term" }).then(
-    function (data) {
-      let topTracks = data.body.items;
-      res.send(topTracks);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
-
-app.get("/top-tracks/medium_term", (req, res) => {
-  spotifyApi.getMyTopTracks({ limit: 50 }).then(
-    function (data) {
-      let topTracks = data.body.items;
-      res.send(topTracks);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
-
-app.get("/top-tracks/short_term", (req, res) => {
-  spotifyApi.getMyTopTracks({ limit: 50, time_range: "short_term" }).then(
-    function (data) {
-      let topTracks = data.body.items;
-      res.send(topTracks);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
-
-app.get("/top-artists/long_term", (req, res) => {
-  spotifyApi.getMyTopArtists({ limit: 50, time_range: "long_term" }).then(
-    function (data) {
-      let topArtists = data.body.items;
-      res.send(topArtists);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
-
-app.get("/top-artists/medium_term", (req, res) => {
-  spotifyApi.getMyTopArtists({ limit: 50 }).then(
-    function (data) {
-      let topArtists = data.body.items;
-      res.send(topArtists);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
-
-app.get("/top-artists/short_term", (req, res) => {
-  spotifyApi.getMyTopArtists({ limit: 50, time_range: "short_term" }).then(
-    function (data) {
-      let topArtists = data.body.items;
-      res.send(topArtists);
-    },
-    function (err) {
-      res.status(500).send(err);
-    }
-  );
-});
 
 app.get("/recently-played", (req, res) => {
   spotifyApi
