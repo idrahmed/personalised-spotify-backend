@@ -21,8 +21,8 @@ const scopes = [
 export const spotifyApi = new SpotifyWebApi({
   clientId: "ec4be58cbb9b474e9e4d978008f361d3",
   clientSecret: "df155eab40c04a07b34a3e3db5e4caa2",
-  redirectUri: "http://localhost:9000/login"
-  // "https://personalised-spotify.herokuapp.com/login",
+  redirectUri: "https://personalised-spotify.herokuapp.com/login"
+  
 });
 
 const app = express();
@@ -70,7 +70,7 @@ app.get("/login", (req, res) => {
         res.send({ access_token: access_token });
       });
 
-      res.redirect("http://localhost:3000/toptracks");
+      res.redirect("https://personalised-spotify.netlify.app/toptracks");
 
       setInterval(async () => {
         const data = await spotifyApi.refreshAccessToken();
