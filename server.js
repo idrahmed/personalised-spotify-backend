@@ -4,6 +4,9 @@ import cors from "cors";
 import recommendationsRouter from "./routes/recommendationRoutes.js";
 import topTracksRouter from "./routes/topTracksRoutes.js";
 import topArtistsRouter from "./routes/topArtistsRoutes.js";
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const scopes = [
   "user-read-recently-played",
@@ -18,11 +21,13 @@ const scopes = [
 
 // credentials are optional
 export const spotifyApi = new SpotifyWebApi({
-  clientId: "ec4be58cbb9b474e9e4d978008f361d3",
-  clientSecret: "df155eab40c04a07b34a3e3db5e4caa2",
-  redirectUri: "https://personalised-spotify.herokuapp.com/callback",
+  clientId: process.env.REACT_APP_CLIENT_ID,
+  clientSecret: process.env.REACT_APP_CLIENT_SECRET,
+  redirectUri: process.env.REACT_APP_REDIRECT,
   //http://localhost:9000/callback
 });
+
+console.log(spotifyApi)
 
 const app = express();
 const PORT = process.env.PORT || 9000;
