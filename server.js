@@ -27,7 +27,6 @@ export const spotifyApi = new SpotifyWebApi({
   //http://localhost:9000/callback
 });
 
-console.log(spotifyApi)
 
 const app = express();
 const PORT = process.env.PORT || 9000;
